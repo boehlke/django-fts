@@ -14,6 +14,7 @@ from fts.models import Word, Index, Namespace
 
 import unicodedata
 from fts.words.stop import FTS_STOPWORDS
+from django.db.models.sql.constants import JoinInfo
 try:
     from fts.words.snowball import Stemmer
 except ImportError:
@@ -280,10 +281,10 @@ class SearchManager(BaseManager):
         }
         # these params should be set as FROM params to be returned by get_from_clause() but it doesn't support FROM params
         joins = joins % tuple(joins_params)
-        
+
         # monkey patch the query set:
         qs.query.table_alias(table_name) # create alias
-        qs.query.alias_map[table_name] = (table_name, joins, None, None, None, None, None) # map the joins to the alias
+        qs.query.alias_map[table_name] = JoinInfo(table_name, joins, None, None, None, None, None) # map the joins to the alias
         
         if rank_field is not None:
             select = {}
